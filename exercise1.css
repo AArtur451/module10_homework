@@ -1,0 +1,13 @@
+.icon-button {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+#icon {
+    margin-right: 5px;
+}

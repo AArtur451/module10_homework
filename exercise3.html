@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat with Geo-location</title>
+    <link rel="stylesheet" href="exercise3.css" />
+  </head>
+  <body>
+    <div class="chat-container">
+      <div id="chat-box" class="chat-box"></div>
+      <input
+        type="text"
+        id="message-input"
+        placeholder="Введите сообщение..."
+      />
+      <button id="send-button">Отправить</button>
+      <button id="location-button">Гео-локация</button>
+    </div>
+
+    <script>
+      const chatBox = document.getElementById("chat-box");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
+      const locationButton = document.getElementById("location-button");
+
+      const socket = new WebSocket("wss://echo-ws-service.herokuapp.com");
+
+      socket.addEventListener("message", function (event) {
+        const message = event.data;
+        if (!message.startsWith("Geo-location:")) {
+          displayMessage(message);
+        }
+      });
+
+      sendButton.addEventListener("click", function () {
+        const message = messageInput.value;
+        if (message.trim() !== "") {
+          sendMessage(message);
+        }
+      });
+
+      locationButton.addEventListener("click", function () {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const geoUrl = `https://www.openstreetmap.org/#map=18/${latitude}/${longitude}`;
+            sendMessage("Geo-location: " + geoUrl);
+            displayMessage(
+              'Вы: <a href="' + geoUrl + '" target="_blank">Гео-локация</a>'
+            );
+          });
+        } else {
+          alert("Ваш браузер не поддерживает геолокацию.");
+        }
+      });
+
+      function sendMessage(message) {
+        socket.send(message);
+        messageInput.value = "";
+      }
+
+      function displayMessage(message) {
+        const messageElement = document.createElement("div");
+        messageElement.innerHTML = message;
+        chatBox.appendChild(messageElement);
+      }
+    </script>
+  </body>
+</html>
